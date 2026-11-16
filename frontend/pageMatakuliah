@@ -1,0 +1,18 @@
+import React from "react";
+import { CourseManagementSection } from "./CourseManagementSection";
+import { NavigationSidebarSection } from "./NavigationSidebarSection";
+
+export const PageMataKuliah: React.FC = () => {
+  return (
+    <main className="flex min-h-screen w-full flex-col items-start bg-[#F8B195]/15">
+      <div className="flex min-h-screen w-full flex-1 flex-col items-start p-0 sm:p-4">
+        <div className="flex min-h-[calc(100vh-32px)] w-full max-w-[1600px] flex-1 items-stretch overflow-hidden bg-[#fbfafc] shadow-[0px_16px_50px_#355C7D20,0px_0px_0px_1px_#6C5B7B33] rounded-xl">
+          <NavigationSidebarSection />
+          <CourseManagementSection />
+        </div>
+      </div>
+    </main>
+  );
+};
+
+export default PageMataKuliah;

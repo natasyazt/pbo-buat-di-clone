@@ -1,0 +1,18 @@
+import React from "react";
+import { AcademicDashboardSection } from "./AcademicDashboardSection";
+import { SidebarNavigationSection } from "./SidebarNavigationSection";
+
+export const Dashboard: React.FC = () => {
+  return (
+    <main className="flex min-h-screen flex-col items-start bg-[#F8B195]/15">
+      <div className="flex min-h-screen w-full flex-1 flex-col items-start p-0 sm:p-4">
+        <div className="flex min-h-[calc(100vh-32px)] w-full max-w-[1600px] items-stretch overflow-hidden bg-[#fbfafc] shadow-[0px_16px_50px_#355C7D20,0px_0px_0px_1px_#6C5B7B33] rounded-xl">
+          <SidebarNavigationSection />
+          <AcademicDashboardSection />
+        </div>
+      </div>
+    </main>
+  );
+};
+
+export default Dashboard;

@@ -1,0 +1,8 @@
+node_modules/
+dist/
+java-app/bin/
+java-app/data/
+paket-push/
+*.class
+.DS_Store
+Thumbs.db
