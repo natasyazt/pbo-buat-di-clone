@@ -36,16 +36,66 @@ public class AcademicRepository {
         this.dataDir = Paths.get(dataDirPath);
     }
 
+    public List<Dosen> loadAllDosen() throws DataPersistenceException {
+        List<Dosen> list = new ArrayList<>();
+        Path file = dataDir.resolve("dosen.tsv");
+        if (!Files.exists(file)) {
+            Dosen def = getDefaultDosen();
+            list.add(def);
+            saveAllDosen(list);
+            return list;
+        }
+        try (BufferedReader r = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
+            String line;
+            while ((line = r.readLine()) != null) {
+                if (line.trim().isEmpty()) continue;
+                String[] p = line.split(DELIM, -1);
+                if (p.length >= 8) {
+                    list.add(new Dosen(p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7]));
+                }
+            }
+        } catch (IOException | ValidasiInputException e) {
+            throw new DataPersistenceException("Gagal memuat data akun dosen.", e);
+        }
+        if (list.isEmpty()) {
+            list.add(getDefaultDosen());
+            saveAllDosen(list);
+        }
+        return list;
+    }
+
+    public void saveAllDosen(List<Dosen> dosenList) throws DataPersistenceException {
+        ensureDir();
+        Path file = dataDir.resolve("dosen.tsv");
+        try (BufferedWriter w = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
+            for (Dosen dosen : dosenList) {
+                w.write(String.join(DELIM,
+                        clean(dosen.getId()),
+                        clean(dosen.getNip()),
+                        clean(dosen.getNama()),
+                        clean(dosen.getGelar()),
+                        clean(dosen.getEmail()),
+                        clean(dosen.getProdi()),
+                        clean(dosen.getFakultas()),
+                        clean(dosen.getPassword())
+                ));
+                w.newLine();
+            }
+        } catch (IOException e) {
+            throw new DataPersistenceException("Gagal menyimpan data akun dosen.", e);
+        }
+    }
+
     public Dosen getDefaultDosen() {
         try {
             return new Dosen(
                     "dos-001",
                     "19820412 200812 2 001",
-                    "Dra. Rina Puspita, M.Kom.",
-                    "Dosen Tetap Informatika",
-                    "rina.puspita@sipena.ac.id",
+                    "Dr. Oky Dwi Nurhayati, S.T., M.T.",
+                    "Dosen S1 Teknik Komputer",
+                    "oky.nurhayati@sipena.ac.id",
                     "S1 Teknik Komputer",
-                    "Fakultas Informatika & Rekayasa Komputer",
+                    "Fakultas Teknik",
                     "password123"
             );
         } catch (ValidasiInputException e) {
@@ -343,16 +393,16 @@ public class AcademicRepository {
     public List<MataKuliah> createDemoMataKuliah() throws ValidasiInputException {
         List<MataKuliah> list = new ArrayList<>();
         list.add(new MataKuliah("mk-pbo-01", "IF2104", "Pemrograman Berorientasi Objek", 3,
-                "Genap 2024/2025", "IF-45-01", "Lab Riset 302", "Senin, 08:00 - 10:30 WIB",
+                "Genap 2024/2025", "A", "Lab Riset 302", "Senin, 08:00 - 10:30 WIB",
                 "Prinsip OOP: Encapsulation, Inheritance, Polymorphism, Abstraction, Design Patterns, dan GUI."));
         list.add(new MataKuliah("mk-pbo-02", "IF2104", "Pemrograman Berorientasi Objek", 3,
-                "Genap 2024/2025", "IF-45-02", "Lab Multimedia 204", "Rabu, 13:00 - 15:30 WIB",
+                "Genap 2024/2025", "B", "Lab Multimedia 204", "Rabu, 13:00 - 15:30 WIB",
                 "Prinsip OOP: Encapsulation, Inheritance, Polymorphism, Abstraction, Design Patterns, dan GUI."));
         list.add(new MataKuliah("mk-sda-01", "IF3102", "Struktur Data & Algoritma", 4,
-                "Genap 2024/2025", "IF-44-03", "GKB 201", "Selasa, 10:00 - 12:30 WIB",
+                "Genap 2024/2025", "C", "GKB 201", "Selasa, 10:00 - 12:30 WIB",
                 "Struktur data linear & non-linear, Tree, Graph, Sorting, Searching, dan Big-O."));
         list.add(new MataKuliah("mk-rpl-01", "IF3205", "Rekayasa Perangkat Lunak", 3,
-                "Genap 2024/2025", "IF-44-01", "Gedung FTI R.304", "Kamis, 08:00 - 10:30 WIB",
+                "Genap 2024/2025", "D", "Gedung FTI R.304", "Kamis, 08:00 - 10:30 WIB",
                 "SDLC, Agile Scrum, Software Architecture, UML modeling, Testing, dan Project Management."));
         return list;
     }
@@ -396,34 +446,34 @@ public class AcademicRepository {
     public List<Mahasiswa> createDemoMahasiswa() throws ValidasiInputException {
         List<Mahasiswa> list = new ArrayList<>();
         list.add(new Mahasiswa("mhs-01", "1301213001", "Muhammad Rayhan Pratama", "rayhan.p@student.ac.id",
-                "2023", "Teknik Komputer", "IF-45-01", 94, Mahasiswa.StatusMahasiswa.AKTIF,
+                "2023", "Teknik Komputer", "A", 94, Mahasiswa.StatusMahasiswa.AKTIF,
                 Arrays.asList("mk-pbo-01", "mk-sda-01")));
         list.add(new Mahasiswa("mhs-02", "1301213002", "Siti Nurhaliza Putri", "siti.nurhaliza@student.ac.id",
-                "2023", "Teknik Komputer", "IF-45-01", 98, Mahasiswa.StatusMahasiswa.AKTIF,
+                "2023", "Teknik Komputer", "C", 98, Mahasiswa.StatusMahasiswa.AKTIF,
                 Arrays.asList("mk-pbo-01")));
         list.add(new Mahasiswa("mhs-03", "1301213003", "Budi Santoso", "budi.santoso@student.ac.id",
-                "2023", "Teknik Informatika", "IF-45-01", 85, Mahasiswa.StatusMahasiswa.AKTIF,
+                "2023", "Teknik Komputer", "B", 85, Mahasiswa.StatusMahasiswa.AKTIF,
                 Arrays.asList("mk-pbo-01", "mk-sda-01")));
         list.add(new Mahasiswa("mhs-04", "1301213004", "Anisa Rahmawati", "anisa.rahma@student.ac.id",
-                "2023", "Teknik Informatika", "IF-45-01", 91, Mahasiswa.StatusMahasiswa.AKTIF,
+                "2023", "Teknik Komputer", "D", 91, Mahasiswa.StatusMahasiswa.AKTIF,
                 Arrays.asList("mk-pbo-01")));
         list.add(new Mahasiswa("mhs-05", "1301213005", "Kevin Wijaya Kusuma", "kevin.wijaya@student.ac.id",
-                "2023", "Teknik Informatika", "IF-45-01", 70, Mahasiswa.StatusMahasiswa.BERISIKO,
+                "2023", "Teknik Komputer", "A", 70, Mahasiswa.StatusMahasiswa.BERISIKO,
                 Arrays.asList("mk-pbo-01")));
         list.add(new Mahasiswa("mhs-06", "1301213006", "Dinda Ayu Maharani", "dinda.maharani@student.ac.id",
-                "2023", "Teknik Informatika", "IF-45-01", 96, Mahasiswa.StatusMahasiswa.AKTIF,
+                "2023", "Teknik Komputer", "B", 96, Mahasiswa.StatusMahasiswa.AKTIF,
                 Arrays.asList("mk-pbo-01")));
         list.add(new Mahasiswa("mhs-07", "1301213007", "Fajar Nugraha", "fajar.nugraha@student.ac.id",
-                "2023", "Teknik Informatika", "IF-45-01", 88, Mahasiswa.StatusMahasiswa.AKTIF,
+                "2023", "Teknik Komputer", "D", 88, Mahasiswa.StatusMahasiswa.AKTIF,
                 Arrays.asList("mk-pbo-01")));
         list.add(new Mahasiswa("mhs-08", "1301213008", "Gita Clarissa", "gita.clarissa@student.ac.id",
-                "2023", "Teknik Informatika", "IF-45-01", 95, Mahasiswa.StatusMahasiswa.AKTIF,
+                "2023", "Teknik Komputer", "C", 95, Mahasiswa.StatusMahasiswa.AKTIF,
                 Arrays.asList("mk-pbo-01", "mk-rpl-01")));
         list.add(new Mahasiswa("mhs-09", "1301213009", "Hafiz Danendra", "hafiz.d@student.ac.id",
-                "2023", "Teknik Informatika", "IF-45-01", 65, Mahasiswa.StatusMahasiswa.BERISIKO,
+                "2023", "Teknik Komputer", "A", 65, Mahasiswa.StatusMahasiswa.BERISIKO,
                 Arrays.asList("mk-pbo-01")));
         list.add(new Mahasiswa("mhs-10", "1301213010", "Nadia Putri Salsabila", "nadia.s@student.ac.id",
-                "2023", "Teknik Komputer", "IF-45-02", 92, Mahasiswa.StatusMahasiswa.AKTIF,
+                "2023", "Teknik Komputer", "C", 92, Mahasiswa.StatusMahasiswa.AKTIF,
                 Arrays.asList("mk-pbo-02", "mk-rpl-01")));
         return list;
     }

@@ -3,7 +3,6 @@ package id.ac.lectura.view;
 import id.ac.lectura.controller.AcademicController;
 import id.ac.lectura.controller.AuthController;
 import id.ac.lectura.exception.DataPersistenceException;
-import id.ac.lectura.exception.ValidasiInputException;
 import id.ac.lectura.util.ThemePalette;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -102,12 +101,14 @@ public class MainFrame extends JFrame {
         MahasiswaPanel mahasiswaPanel = new MahasiswaPanel(academicController);
         KomponenPenilaianPanel komponenPanel = new KomponenPenilaianPanel(academicController);
         InputNilaiPanel inputNilaiPanel = new InputNilaiPanel(academicController);
+        ProfilePanel profilePanel = new ProfilePanel(authController, academicController);
 
         workspaceContent.add(dashboardPanel, SidebarPanel.VIEW_DASHBOARD);
         workspaceContent.add(mataKuliahPanel, SidebarPanel.VIEW_MATAKULIAH);
         workspaceContent.add(mahasiswaPanel, SidebarPanel.VIEW_MAHASISWA);
         workspaceContent.add(komponenPanel, SidebarPanel.VIEW_KOMPONEN);
         workspaceContent.add(inputNilaiPanel, SidebarPanel.VIEW_INPUT_NILAI);
+        workspaceContent.add(profilePanel, SidebarPanel.VIEW_PROFILE);
 
         rightArea.add(topBar, BorderLayout.NORTH);
         rightArea.add(workspaceContent, BorderLayout.CENTER);
@@ -133,21 +134,6 @@ public class MainFrame extends JFrame {
             }
         });
 
-        JMenuItem miReset = new JMenuItem("Reset Data Demo");
-        miReset.addActionListener(e -> {
-            int c = JOptionPane.showConfirmDialog(this,
-                    "Kembalikan seluruh data ke kondisi awal demo?",
-                    "Konfirmasi Reset", JOptionPane.YES_NO_OPTION);
-            if (c == JOptionPane.YES_OPTION) {
-                try {
-                    academicController.resetToDemoData();
-                } catch (DataPersistenceException | ValidasiInputException ex) {
-                    JOptionPane.showMessageDialog(this, ex.getMessage(),
-                            "Kesalahan", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
-
         JMenuItem miLogout = new JMenuItem("Keluar Sesi (Logout)");
         miLogout.addActionListener(e -> handleLogout());
 
@@ -155,7 +141,6 @@ public class MainFrame extends JFrame {
         miExit.addActionListener(e -> System.exit(0));
 
         fileMenu.add(miSave);
-        fileMenu.add(miReset);
         fileMenu.addSeparator();
         fileMenu.add(miLogout);
         fileMenu.add(miExit);
@@ -166,6 +151,7 @@ public class MainFrame extends JFrame {
         addNavMenuItem(navMenu, "Mata Kuliah", SidebarPanel.VIEW_MATAKULIAH);
         addNavMenuItem(navMenu, "Komponen Penilaian", SidebarPanel.VIEW_KOMPONEN);
         addNavMenuItem(navMenu, "Input & Rekap Nilai", SidebarPanel.VIEW_INPUT_NILAI);
+        addNavMenuItem(navMenu, "Profil Dosen", SidebarPanel.VIEW_PROFILE);
 
         JMenu helpMenu = new JMenu("Bantuan");
         JMenuItem miAbout = new JMenuItem("Tentang LECTURA");
@@ -203,6 +189,7 @@ public class MainFrame extends JFrame {
             case SidebarPanel.VIEW_MAHASISWA:  label = "Mahasiswa"; break;
             case SidebarPanel.VIEW_KOMPONEN:   label = "Komponen Penilaian"; break;
             case SidebarPanel.VIEW_INPUT_NILAI:label = "Input & Rekap Nilai"; break;
+            case SidebarPanel.VIEW_PROFILE:    label = "Profil Dosen"; break;
             default:                           label = "Beranda"; break;
         }
         lblBreadcrumb.setText("LECTURA  >  " + label);

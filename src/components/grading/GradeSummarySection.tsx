@@ -565,10 +565,10 @@ export const GradeSummarySection: React.FC = () => {
                 KEMENTERIAN PENDIDIKAN TINGGI, SAINS DAN TEKNOLOGI
               </div>
               <div className="font-serif font-bold text-base text-[#6C5B7B]">
-                FAKULTAS INFORMATIKA & REKAYASA KOMPUTER
+                FAKULTAS TEKNIK KOMPUTER & REKAYASA
               </div>
               <div className="text-xs text-[#355C7D] mt-0.5 font-medium">
-                PROGRAM STUDI S1 TEKNIK INFORMATIKA — SISTEM PENILAIAN LECTURA
+                PROGRAM STUDI S1 TEKNIK KOMPUTER — SISTEM PENILAIAN LECTURA
               </div>
               <div className="text-[10px] text-[#6C5B7B] mt-0.5">
                 Jl. Pendidikan Akademik No. 1 • Telp (021) 7891234 • sipena.ac.id
@@ -670,7 +670,7 @@ export const GradeSummarySection: React.FC = () => {
               <div>
                 <p className="text-[#6C5B7B]">Mengetahui,</p>
                 <p className="font-bold text-[#355C7D]">
-                  Ketua Program Studi S1 Teknik Informatika
+                  Ketua Program Studi S1 Teknik Komputer
                 </p>
                 <div className="h-16"></div>
                 <p className="font-bold underline text-[#355C7D]">

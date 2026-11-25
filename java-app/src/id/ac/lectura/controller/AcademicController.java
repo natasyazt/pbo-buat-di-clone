@@ -64,7 +64,7 @@ public class AcademicController {
             nilaiList.addAll(repository.loadNilai());
             aktivitasList.addAll(repository.loadAktivitas());
         } else {
-            loadDemoData();
+            loadInitialData();
             saveAll();
         }
 
@@ -74,23 +74,7 @@ public class AcademicController {
         notifyListeners();
     }
 
-    public void resetToDemoData() throws DataPersistenceException, ValidasiInputException {
-        mataKuliahList.clear();
-        mahasiswaList.clear();
-        komponenList.clear();
-        nilaiList.clear();
-        aktivitasList.clear();
-
-        loadDemoData();
-        catatAktivitas("Reset Data Demo", "SISTEM", "Seluruh data dikembalikan ke kondisi awal demo");
-        saveAll();
-        if (!mataKuliahList.isEmpty()) {
-            selectedMataKuliahId = mataKuliahList.get(0).getId();
-        }
-        notifyListeners();
-    }
-
-    private void loadDemoData() throws ValidasiInputException {
+    private void loadInitialData() throws ValidasiInputException {
         mataKuliahList.addAll(repository.createDemoMataKuliah());
         komponenList.addAll(repository.createDemoKomponen());
         mahasiswaList.addAll(repository.createDemoMahasiswa());
@@ -378,6 +362,16 @@ public class AcademicController {
 
     public List<AktivitasLog> getAktivitasList() {
         return Collections.unmodifiableList(aktivitasList);
+    }
+
+    public void logAktivitas(String aksi, String kategori, String detail) {
+        catatAktivitas(aksi, kategori, detail);
+        try {
+            saveAll();
+        } catch (DataPersistenceException ignored) {
+            // Aktivitas tetap tercatat di memori jika penyimpanan sementara gagal
+        }
+        notifyListeners();
     }
 
     private void catatAktivitas(String aksi, String kategori, String detail) {

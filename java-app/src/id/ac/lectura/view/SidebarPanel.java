@@ -2,8 +2,6 @@ package id.ac.lectura.view;
 
 import id.ac.lectura.controller.AcademicController;
 import id.ac.lectura.controller.AuthController;
-import id.ac.lectura.exception.DataPersistenceException;
-import id.ac.lectura.exception.ValidasiInputException;
 import id.ac.lectura.model.Dosen;
 import id.ac.lectura.model.MataKuliah;
 import id.ac.lectura.util.ThemePalette;
@@ -42,6 +40,7 @@ public class SidebarPanel extends JPanel {
     public static final String VIEW_MAHASISWA = "mahasiswa";
     public static final String VIEW_KOMPONEN = "komponen";
     public static final String VIEW_INPUT_NILAI = "input-nilai";
+    public static final String VIEW_PROFILE = "profile";
 
     private final AcademicController controller;
     private final AuthController authController;
@@ -50,6 +49,8 @@ public class SidebarPanel extends JPanel {
 
     private final Map<String, JButton> navButtons = new LinkedHashMap<>();
     private JComboBox<MataKuliah> cboActiveCourse;
+    private JLabel lblRp;
+    private JLabel dName;
     private boolean updatingCombo = false;
     private String activeView = VIEW_DASHBOARD;
 
@@ -61,6 +62,7 @@ public class SidebarPanel extends JPanel {
         this.onLogout = onLogout;
         initUI();
         controller.addChangeListener(this::refreshData);
+        authController.addProfileListener(this::refreshProfileInfo);
     }
 
     private void initUI() {
@@ -118,6 +120,7 @@ public class SidebarPanel extends JPanel {
         addNavButton(top, VIEW_MATAKULIAH, "Mata Kuliah");
         addNavButton(top, VIEW_KOMPONEN, "Komponen Penilaian");
         addNavButton(top, VIEW_INPUT_NILAI, "Input & Rekap Nilai");
+        addNavButton(top, VIEW_PROFILE, "Profil Dosen");
 
         top.add(Box.createVerticalStrut(14));
 
@@ -211,14 +214,14 @@ public class SidebarPanel extends JPanel {
         ThemePalette.RoundedPanel avatar = new ThemePalette.RoundedPanel(32, ThemePalette.PEACH, null);
         avatar.setPreferredSize(new Dimension(34, 34));
         avatar.setLayout(new BorderLayout());
-        JLabel lblRp = new JLabel("RP", JLabel.CENTER);
+        lblRp = new JLabel(ProfilePanel.extractInitials(dosen.getNama()), JLabel.CENTER);
         lblRp.setFont(ThemePalette.FONT_SMALL_BOLD);
         lblRp.setForeground(ThemePalette.NAVY_DARK);
         avatar.add(lblRp, BorderLayout.CENTER);
 
         JPanel dTxt = new JPanel(new GridLayout(2, 1));
         dTxt.setOpaque(false);
-        JLabel dName = new JLabel(dosen.getNama());
+        dName = new JLabel(dosen.getNama());
         dName.setFont(new Font("SansSerif", Font.BOLD, 11));
         dName.setForeground(ThemePalette.NAVY_DARK);
         JLabel dRole = new JLabel("Dosen Pengampu");
@@ -237,15 +240,18 @@ public class SidebarPanel extends JPanel {
         actionRow.setMaximumSize(new Dimension(218, 32));
         actionRow.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JButton btnReset = ThemePalette.createSecondaryButton("Reset");
-        btnReset.setFont(ThemePalette.FONT_SMALL_BOLD);
-        btnReset.addActionListener(e -> handleReset());
+        JButton btnProfile = ThemePalette.createSecondaryButton("Profil");
+        btnProfile.setFont(ThemePalette.FONT_SMALL_BOLD);
+        btnProfile.addActionListener(e -> {
+            setActiveView(VIEW_PROFILE);
+            onNavigate.accept(VIEW_PROFILE);
+        });
 
         JButton btnLogout = ThemePalette.createDangerButton("Keluar");
         btnLogout.setFont(ThemePalette.FONT_SMALL_BOLD);
         btnLogout.addActionListener(e -> onLogout.run());
 
-        actionRow.add(btnReset);
+        actionRow.add(btnProfile);
         actionRow.add(btnLogout);
         bottom.add(actionRow);
 
@@ -315,21 +321,9 @@ public class SidebarPanel extends JPanel {
         updatingCombo = false;
     }
 
-    private void handleReset() {
-        int confirm = JOptionPane.showConfirmDialog(
-                this,
-                "Kembalikan seluruh data ke nilai awal demo?",
-                "Konfirmasi Reset Data",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE
-        );
-        if (confirm == JOptionPane.YES_OPTION) {
-            try {
-                controller.resetToDemoData();
-            } catch (DataPersistenceException | ValidasiInputException ex) {
-                JOptionPane.showMessageDialog(this, ex.getMessage(),
-                        "Kesalahan", JOptionPane.ERROR_MESSAGE);
-            }
-        }
+    public void refreshProfileInfo() {
+        Dosen d = authController.getDosenAktif();
+        dName.setText(d.getNama());
+        lblRp.setText(ProfilePanel.extractInitials(d.getNama()));
     }
 }

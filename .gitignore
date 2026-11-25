@@ -2,6 +2,7 @@ node_modules/
 dist/
 java-app/bin/
 java-app/data/
+data/
 paket-push/
 *.class
 .DS_Store

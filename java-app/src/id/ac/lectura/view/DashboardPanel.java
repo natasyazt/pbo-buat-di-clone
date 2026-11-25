@@ -36,6 +36,7 @@ public class DashboardPanel extends JPanel {
     private final AuthController authController;
     private final Consumer<String> onNavigate;
 
+    private JLabel lblWelcome;
     private JPanel kpiContainer;
     private JPanel progressListContainer;
     private VerticalBarChartPanel barChartPanel;
@@ -48,6 +49,7 @@ public class DashboardPanel extends JPanel {
         this.onNavigate = onNavigate;
         initUI();
         controller.addChangeListener(this::refreshData);
+        authController.addProfileListener(this::refreshWelcome);
     }
 
     private void initUI() {
@@ -66,7 +68,7 @@ public class DashboardPanel extends JPanel {
 
         JPanel titleBox = new JPanel(new GridLayout(2, 1, 0, 2));
         titleBox.setOpaque(false);
-        JLabel lblWelcome = new JLabel("Selamat datang, " + authController.getDosenAktif().getNama());
+        lblWelcome = new JLabel("Selamat datang, " + authController.getDosenAktif().getNama());
         lblWelcome.setFont(ThemePalette.FONT_SERIF_TITLE);
         lblWelcome.setForeground(ThemePalette.NAVY_DARK);
         JLabel lblSub = new JLabel("Berikut ringkasan aktivitas akademik semester ini.");
@@ -178,6 +180,10 @@ public class DashboardPanel extends JPanel {
         scroll.setBorder(null);
         scroll.getVerticalScrollBar().setUnitIncrement(16);
         add(scroll, BorderLayout.CENTER);
+    }
+
+    public void refreshWelcome() {
+        lblWelcome.setText("Selamat datang, " + authController.getDosenAktif().getNama());
     }
 
     public void refreshData() {

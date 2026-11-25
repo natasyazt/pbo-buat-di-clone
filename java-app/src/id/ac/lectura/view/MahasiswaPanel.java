@@ -267,8 +267,8 @@ public class MahasiswaPanel extends JPanel {
         JTextField fNama = ThemePalette.createStyledTextField(existing != null ? existing.getNama() : "");
         JTextField fEmail = ThemePalette.createStyledTextField(existing != null ? existing.getEmail() : "");
         JTextField fAngkatan = ThemePalette.createStyledTextField(existing != null ? existing.getAngkatan() : "2023");
-        JTextField fProdi = ThemePalette.createStyledTextField(existing != null ? existing.getProdi() : "Teknik Informatika");
-        JTextField fKelas = ThemePalette.createStyledTextField(existing != null ? existing.getKelas() : "IF-45-01");
+        JTextField fProdi = ThemePalette.createStyledTextField(existing != null ? existing.getProdi() : "Teknik Komputer");
+        JTextField fKelas = ThemePalette.createStyledTextField(existing != null ? existing.getKelas() : "A");
         JSpinner fHadir = new JSpinner(new SpinnerNumberModel(existing != null ? existing.getKehadiranPersen() : 90, 0, 100, 1));
         JComboBox<Mahasiswa.StatusMahasiswa> fStatus = new JComboBox<>(Mahasiswa.StatusMahasiswa.values());
         if (existing != null) fStatus.setSelectedItem(existing.getStatus());

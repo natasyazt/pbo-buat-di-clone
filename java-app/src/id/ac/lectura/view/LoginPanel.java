@@ -1,13 +1,18 @@
 package id.ac.lectura.view;
 
 import id.ac.lectura.controller.AuthController;
+import id.ac.lectura.exception.DataPersistenceException;
 import id.ac.lectura.exception.ValidasiInputException;
+import id.ac.lectura.model.Dosen;
 import id.ac.lectura.util.ThemePalette;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -27,21 +32,38 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 /**
- * Tampilan Login LECTURA bergaya Figma dengan palet warna LECTURA.
+ * Tampilan Login & Registrasi Multi-Akun Dosen LECTURA bergaya Figma.
  */
 public class LoginPanel extends JPanel {
     private static final long serialVersionUID = 1L;
+    private static final String CARD_LOGIN = "LOGIN_FORM";
+    private static final String CARD_REGISTER = "REGISTER_FORM";
 
     private final AuthController authController;
     private final Runnable onLoginSuccess;
 
+    private final CardLayout rightCards = new CardLayout();
+    private final JPanel rightContainer = new JPanel(rightCards);
+
+    // Login fields
     private JTextField txtEmail;
     private JPasswordField txtPassword;
     private JCheckBox chkShowPassword;
     private JCheckBox chkRememberMe;
+
+    // Register fields
+    private JTextField regNama;
+    private JTextField regNip;
+    private JTextField regGelar;
+    private JTextField regEmail;
+    private JTextField regProdi;
+    private JTextField regFakultas;
+    private JPasswordField regPass;
+    private JPasswordField regConfirm;
 
     public LoginPanel(AuthController authController, Runnable onLoginSuccess) {
         this.authController = authController;
@@ -53,7 +75,11 @@ public class LoginPanel extends JPanel {
         setLayout(new GridLayout(1, 2));
         setBackground(ThemePalette.BG_LIGHT);
         add(buildLeftBrandPanel());
-        add(buildRightFormPanel());
+
+        rightContainer.setBackground(ThemePalette.BG_LIGHT);
+        rightContainer.add(buildLoginFormPanel(), CARD_LOGIN);
+        rightContainer.add(buildRegisterFormPanel(), CARD_REGISTER);
+        add(rightContainer);
     }
 
     private JPanel buildLeftBrandPanel() {
@@ -75,7 +101,6 @@ public class LoginPanel extends JPanel {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createEmptyBorder(36, 44, 28, 44));
 
-        // Logo row
         JPanel logoRow = new JPanel(new BorderLayout(12, 0));
         logoRow.setOpaque(false);
         logoRow.setMaximumSize(new Dimension(420, 44));
@@ -105,7 +130,6 @@ public class LoginPanel extends JPanel {
         panel.add(logoRow);
         panel.add(Box.createVerticalStrut(32));
 
-        // Outlined pill badge
         ThemePalette.RoundedPanel pill = new ThemePalette.RoundedPanel(8, new Color(255, 255, 255, 18), ThemePalette.PEACH);
         pill.setLayout(new BorderLayout());
         pill.setBorder(BorderFactory.createEmptyBorder(5, 12, 5, 12));
@@ -132,7 +156,6 @@ public class LoginPanel extends JPanel {
         panel.add(desc);
         panel.add(Box.createVerticalStrut(26));
 
-        // Wireframe dashboard illustration (matching Figma Image 1)
         JPanel wireframe = new JPanel() {
             private static final long serialVersionUID = 1L;
             @Override
@@ -150,7 +173,6 @@ public class LoginPanel extends JPanel {
                 g2.setStroke(new BasicStroke(1.2f));
                 g2.draw(new RoundRectangle2D.Double(4, 4, w, h, 14, 14));
 
-                // Window dots
                 g2.setColor(ThemePalette.PEACH);
                 g2.fillOval(18, 16, 6, 6);
                 g2.setColor(ThemePalette.CORAL);
@@ -158,13 +180,10 @@ public class LoginPanel extends JPanel {
                 g2.setColor(new Color(255, 255, 255, 100));
                 g2.fillOval(40, 16, 6, 6);
 
-                // Top divider
                 g2.setColor(new Color(255, 255, 255, 40));
                 g2.drawLine(4, 32, w + 4, 32);
-                // Sidebar divider
                 g2.drawLine(105, 32, 105, h + 4);
 
-                // Sidebar bars
                 g2.setColor(ThemePalette.PEACH);
                 g2.fillRoundRect(20, 50, 62, 10, 4, 4);
                 g2.setColor(new Color(255, 255, 255, 60));
@@ -173,11 +192,9 @@ public class LoginPanel extends JPanel {
                 g2.fillRoundRect(20, 106, 48, 6, 3, 3);
                 g2.fillRoundRect(20, 122, 60, 6, 3, 3);
 
-                // Right header bar
                 g2.setColor(new Color(255, 255, 255, 140));
                 g2.fillRoundRect(122, 48, 110, 10, 4, 4);
 
-                // 3 KPI wireframe boxes
                 int boxW = Math.max(40, (w - 146) / 3);
                 for (int i = 0; i < 3; i++) {
                     int bx = 122 + i * (boxW + 10);
@@ -187,7 +204,6 @@ public class LoginPanel extends JPanel {
                     g2.drawRoundRect(bx, 70, boxW, 44, 8, 8);
                 }
 
-                // Bottom table wireframe box
                 g2.setColor(new Color(255, 255, 255, 16));
                 g2.fillRoundRect(122, 126, w - 134, Math.max(50, h - 138), 8, 8);
                 g2.setColor(new Color(255, 255, 255, 55));
@@ -215,7 +231,7 @@ public class LoginPanel extends JPanel {
         return panel;
     }
 
-    private JPanel buildRightFormPanel() {
+    private JPanel buildLoginFormPanel() {
         JPanel wrapper = new JPanel(new GridBagLayout());
         wrapper.setBackground(ThemePalette.BG_LIGHT);
 
@@ -268,7 +284,7 @@ public class LoginPanel extends JPanel {
         gbc.insets = new Insets(0, 0, 6, 0);
         form.add(lblPass, gbc);
 
-        txtPassword = ThemePalette.createStyledPasswordField("password123");
+        txtPassword = ThemePalette.createStyledPasswordField("");
         gbc.gridy = 6;
         gbc.insets = new Insets(0, 0, 10, 0);
         form.add(txtPassword, gbc);
@@ -297,37 +313,171 @@ public class LoginPanel extends JPanel {
         btnLogin.setPreferredSize(new Dimension(380, 42));
         btnLogin.addActionListener(e -> handleLogin());
         gbc.gridy = 8;
-        gbc.insets = new Insets(0, 0, 10, 0);
+        gbc.insets = new Insets(0, 0, 14, 0);
         form.add(btnLogin, gbc);
 
-        JButton btnQuick = ThemePalette.createSecondaryButton("Demo Cepat (Dra. Rina Puspita)");
-        btnQuick.setPreferredSize(new Dimension(380, 38));
-        btnQuick.addActionListener(e -> {
-            authController.quickLogin();
-            onLoginSuccess.run();
-        });
-        gbc.gridy = 9;
-        gbc.insets = new Insets(0, 0, 18, 0);
-        form.add(btnQuick, gbc);
+        JPanel regRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 0));
+        regRow.setOpaque(false);
+        JLabel lblNoAcc = new JLabel("Belum memiliki akun?");
+        lblNoAcc.setFont(ThemePalette.FONT_SMALL);
+        lblNoAcc.setForeground(ThemePalette.TEXT_MUTED);
+        JButton btnGoRegister = createLinkButton("Daftar sekarang");
+        btnGoRegister.addActionListener(e -> rightCards.show(rightContainer, CARD_REGISTER));
+        regRow.add(lblNoAcc);
+        regRow.add(btnGoRegister);
 
-        JLabel hint = new JLabel("Akun demo: rina.puspita@sipena.ac.id / password123");
-        hint.setFont(ThemePalette.FONT_SMALL);
-        hint.setForeground(ThemePalette.TEXT_MUTED);
-        hint.setHorizontalAlignment(JLabel.CENTER);
-        gbc.gridy = 10;
-        form.add(hint, gbc);
+        gbc.gridy = 9;
+        gbc.insets = new Insets(4, 0, 0, 0);
+        form.add(regRow, gbc);
 
         wrapper.add(form);
         return wrapper;
     }
 
+    private JPanel buildRegisterFormPanel() {
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.setBackground(ThemePalette.BG_LIGHT);
+        wrapper.setBorder(BorderFactory.createEmptyBorder(28, 48, 28, 48));
+
+        JPanel form = new JPanel(new GridBagLayout());
+        form.setOpaque(false);
+        GridBagConstraints g = new GridBagConstraints();
+        g.gridx = 0;
+        g.fill = GridBagConstraints.HORIZONTAL;
+        g.weightx = 1.0;
+
+        JLabel kic = new JLabel("REGISTRASI DOSEN BARU");
+        kic.setFont(new Font("SansSerif", Font.BOLD, 10));
+        kic.setForeground(ThemePalette.PURPLE);
+        g.gridy = 0;
+        g.insets = new Insets(0, 0, 4, 0);
+        form.add(kic, g);
+
+        JLabel title = new JLabel("Buat Akun LECTURA");
+        title.setFont(ThemePalette.FONT_SERIF_TITLE);
+        title.setForeground(ThemePalette.NAVY_DARK);
+        g.gridy = 1;
+        g.insets = new Insets(0, 0, 4, 0);
+        form.add(title, g);
+
+        JLabel sub = new JLabel("Lengkapi identitas akademik untuk masuk ke portal dosen.");
+        sub.setFont(ThemePalette.FONT_SMALL);
+        sub.setForeground(ThemePalette.TEXT_MUTED);
+        g.gridy = 2;
+        g.insets = new Insets(0, 0, 14, 0);
+        form.add(sub, g);
+
+        regNama = ThemePalette.createStyledTextField("");
+        regNip = ThemePalette.createStyledTextField("");
+        regGelar = ThemePalette.createStyledTextField("Dosen S1 Teknik Komputer");
+        regEmail = ThemePalette.createStyledTextField("");
+        regProdi = ThemePalette.createStyledTextField("S1 Teknik Komputer");
+        regFakultas = ThemePalette.createStyledTextField("Fakultas Teknik");
+        regPass = ThemePalette.createStyledPasswordField("");
+        regConfirm = ThemePalette.createStyledPasswordField("");
+
+        int r = 3;
+        r = addRegField(form, g, r, "Nama Lengkap & Gelar", regNama);
+        r = addRegField(form, g, r, "NIP", regNip);
+        r = addRegField(form, g, r, "Jabatan", regGelar);
+        r = addRegField(form, g, r, "Email Institusi", regEmail);
+        r = addRegField(form, g, r, "Program Studi", regProdi);
+        r = addRegField(form, g, r, "Fakultas", regFakultas);
+        r = addRegField(form, g, r, "Kata Sandi (min. 6 karakter)", regPass);
+        r = addRegField(form, g, r, "Konfirmasi Kata Sandi", regConfirm);
+
+        JButton btnRegister = ThemePalette.createPrimaryButton("Daftar Akun Dosen   →");
+        btnRegister.setPreferredSize(new Dimension(360, 40));
+        btnRegister.addActionListener(e -> handleRegister());
+        g.gridy = r;
+        g.insets = new Insets(12, 0, 10, 0);
+        form.add(btnRegister, g);
+
+        JPanel backRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 4, 0));
+        backRow.setOpaque(false);
+        JLabel lblHave = new JLabel("Sudah punya akun?");
+        lblHave.setFont(ThemePalette.FONT_SMALL);
+        lblHave.setForeground(ThemePalette.TEXT_MUTED);
+        JButton btnBackLogin = createLinkButton("Masuk di sini");
+        btnBackLogin.addActionListener(e -> rightCards.show(rightContainer, CARD_LOGIN));
+        backRow.add(lblHave);
+        backRow.add(btnBackLogin);
+        g.gridy = r + 1;
+        g.insets = new Insets(2, 0, 0, 0);
+        form.add(backRow, g);
+
+        JScrollPane scroll = new JScrollPane(form);
+        scroll.setBorder(null);
+        scroll.setOpaque(false);
+        scroll.getViewport().setOpaque(false);
+        scroll.getVerticalScrollBar().setUnitIncrement(14);
+        wrapper.add(scroll, BorderLayout.CENTER);
+        return wrapper;
+    }
+
+    private int addRegField(JPanel panel, GridBagConstraints g, int row, String label, Component comp) {
+        JLabel lbl = new JLabel(label);
+        lbl.setFont(ThemePalette.FONT_SMALL_BOLD);
+        lbl.setForeground(ThemePalette.TEXT_DARK);
+        g.gridy = row;
+        g.insets = new Insets(4, 0, 2, 0);
+        panel.add(lbl, g);
+
+        g.gridy = row + 1;
+        g.insets = new Insets(0, 0, 6, 0);
+        panel.add(comp, g);
+        return row + 2;
+    }
+
+    private JButton createLinkButton(String text) {
+        JButton btn = new JButton("<html><u>" + text + "</u></html>");
+        btn.setFont(ThemePalette.FONT_SMALL_BOLD);
+        btn.setForeground(ThemePalette.NAVY);
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 2));
+        return btn;
+    }
+
     private void handleLogin() {
         try {
             authController.login(txtEmail.getText(), new String(txtPassword.getPassword()));
+            txtPassword.setText("");
             onLoginSuccess.run();
         } catch (ValidasiInputException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(),
                     "Gagal Masuk", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void handleRegister() {
+        try {
+            Dosen baru = authController.register(
+                    regNama.getText(),
+                    regNip.getText(),
+                    regGelar.getText(),
+                    regEmail.getText(),
+                    regProdi.getText(),
+                    regFakultas.getText(),
+                    new String(regPass.getPassword()),
+                    new String(regConfirm.getPassword())
+            );
+            txtEmail.setText(baru.getEmail());
+            txtPassword.setText("");
+            regNama.setText("");
+            regNip.setText("");
+            regEmail.setText("");
+            regPass.setText("");
+            regConfirm.setText("");
+            JOptionPane.showMessageDialog(this,
+                    "Akun dosen " + baru.getNama() + " berhasil didaftarkan!\nSilakan masuk menggunakan email dan kata sandi Anda.",
+                    "Registrasi Berhasil", JOptionPane.INFORMATION_MESSAGE);
+            rightCards.show(rightContainer, CARD_LOGIN);
+        } catch (ValidasiInputException | DataPersistenceException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(),
+                    "Registrasi Gagal", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

@@ -15,7 +15,7 @@ import { useAcademic } from '../../context/AcademicContext';
 
 export const LoginSignup: React.FC = () => {
   const { login, dosen } = useAcademic();
-  const [email, setEmail] = useState('rina.puspita@sipena.ac.id');
+  const [email, setEmail] = useState('oky.nurhayati@sipena.ac.id');
   const [password, setPassword] = useState('password123');
   const [rememberMe, setRememberMe] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
@@ -262,7 +262,7 @@ export const LoginSignup: React.FC = () => {
                     <span>Akun Pengujian Dosen</span>
                   </div>
                   <div className="text-[9px] text-[#6C5B7B]">
-                    Dra. Rina Puspita, M.Kom. (Informatika)
+                    Dra. Rina Puspita, M.Kom. (Teknik Komputer)
                   </div>
                 </div>
                 <button
